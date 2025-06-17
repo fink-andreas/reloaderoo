@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "test-direct": {
+      "command": "node",
+      "args": ["/Volumes/Developer/mcpdev-proxy/test-server.js"]
+    },
+    "test-proxied": {
+      "command": "/Volumes/Developer/mcpdev-proxy/dist/bin/mcpdev-proxy.js",
+      "args": ["--child-cmd", "node", "--child-args", "/Volumes/Developer/mcpdev-proxy/test-server.js", "--log-level", "debug"]
+    }
+  }
+}

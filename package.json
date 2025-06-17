@@ -1,0 +1,60 @@
+{
+  "name": "mcpdev-proxy",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "A transparent MCP development wrapper that acts as a proxy between MCP clients and servers, enabling hot-reloading without losing client session state",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "development",
+    "proxy",
+    "hot-reload"
+  ],
+  "homepage": "https://github.com/your-org/mcpdev-proxy",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/mcpdev-proxy.git"
+  },
+  "license": "MIT",
+  "author": "Your Name <your.email@example.com>",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "mcpdev-proxy": "dist/index.js"
+  },
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest --coverage",
+    "prepare-release": "npm run build && npm test",
+    "clean": "rm -rf dist/",
+    "lint": "tsc --noEmit",
+    "prepublishOnly": "npm run prepare-release",
+    "inspector": "pkill -f '@modelcontextprotocol/inspector' || true && DANGEROUSLY_OMIT_AUTH=true npx @modelcontextprotocol/inspector",
+    "test:inspector": "npm run build && npm run inspector"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.3",
+    "commander": "^12.1.0",
+    "cross-spawn": "^7.0.3",
+    "pino": "^9.4.0",
+    "pino-pretty": "^13.0.0"
+  },
+  "devDependencies": {
+    "@types/cross-spawn": "^6.0.6",
+    "@types/node": "^22.10.2",
+    "@vitest/coverage-v8": "^2.1.9",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
