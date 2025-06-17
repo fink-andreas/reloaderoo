@@ -1,5 +1,5 @@
 {
-  "name": "mcpdev-proxy",
+  "name": "reloaderoo",
   "version": "1.0.0",
   "type": "module",
   "description": "Hot-reload your MCP servers without restarting your AI coding assistant. A transparent development proxy for the Model Context Protocol that enables seamless server restarts during development.",
@@ -16,20 +16,20 @@
     "development-tools",
     "debugging"
   ],
-  "homepage": "https://github.com/your-org/mcpdev-proxy#readme",
+  "homepage": "https://github.com/your-org/reloaderoo#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/your-org/mcpdev-proxy.git"
+    "url": "git+https://github.com/your-org/reloaderoo.git"
   },
   "bugs": {
-    "url": "https://github.com/your-org/mcpdev-proxy/issues"
+    "url": "https://github.com/your-org/reloaderoo/issues"
   },
   "license": "MIT",
   "author": "Your Name <your.email@example.com>",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "mcpdev-proxy": "dist/index.js"
+    "reloaderoo": "dist/index.js"
   },
   "files": [
     "dist/",

@@ -1,7 +1,7 @@
 /**
- * Type definitions for mcpdev-proxy
+ * Type definitions for reloaderoo
  * 
- * This file provides comprehensive TypeScript types for the MCP development proxy,
+ * This file provides comprehensive TypeScript types for reloaderoo,
  * extending the official MCP v2025-03-26 protocol types with proxy-specific functionality.
  */
 
@@ -51,7 +51,7 @@ import type {
 // =============================================================================
 
 /**
- * Main configuration interface for the MCP development proxy.
+ * Main configuration interface for reloaderoo.
  * Defines how the proxy should launch and manage the child MCP server.
  */
 export interface ProxyConfig {

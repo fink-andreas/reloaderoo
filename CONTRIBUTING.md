@@ -1,13 +1,13 @@
-# Contributing to mcpdev-proxy
+# Contributing to reloaderoo
 
-Thank you for your interest in contributing to mcpdev-proxy! We welcome contributions from the community.
+Thank you for your interest in contributing to reloaderoo! We welcome contributions from the community.
 
 ## Development Setup
 
 1. **Fork and clone the repository**
    ```bash
-   git clone https://github.com/your-username/mcpdev-proxy.git
-   cd mcpdev-proxy
+   git clone https://github.com/your-username/reloaderoo.git
+   cd reloaderoo
    ```
 
 2. **Install dependencies**

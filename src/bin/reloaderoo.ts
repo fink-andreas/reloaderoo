@@ -1,16 +1,16 @@
 /**
- * mcpdev-proxy CLI entry point
+ * reloaderoo CLI entry point
  * 
  * A transparent MCP development wrapper that enables hot-reloading of MCP servers
  * without losing client session state. Acts as a proxy between MCP clients and servers.
  * 
  * Usage:
- *   mcpdev-proxy --child-cmd "node server.js" [options]
- *   mcpdev-proxy info
+ *   reloaderoo --child-cmd "node server.js" [options]
+ *   reloaderoo info
  * 
  * Example:
- *   mcpdev-proxy --child-cmd "node /path/to/my-mcp-server.js" --log-level debug
- *   mcpdev-proxy --child-cmd "python server.py" --child-args "--port" "8080" --working-dir ./src
+ *   reloaderoo --child-cmd "node /path/to/my-mcp-server.js" --log-level debug
+ *   reloaderoo --child-cmd "python server.py" --child-args "--port" "8080" --working-dir ./src
  */
 
 import { Command } from 'commander';
@@ -106,25 +106,25 @@ function formatDuration(ms: number): string {
 const program = new Command();
 
 program
-  .name('mcpdev-proxy')
+  .name('reloaderoo')
   .description('A transparent MCP development wrapper for hot-reloading servers')
   .version(getVersion())
   .usage('[options] | info')
   .addHelpText('after', `
 Examples:
-  $ mcpdev-proxy --child-cmd "node server.js"
-  $ mcpdev-proxy --child-cmd "python mcp_server.py" --log-level debug
-  $ mcpdev-proxy --child-cmd "npm run serve" --working-dir ./src --max-restarts 5
-  $ mcpdev-proxy info
+  $ reloaderoo --child-cmd "node server.js"
+  $ reloaderoo --child-cmd "python mcp_server.py" --log-level debug
+  $ reloaderoo --child-cmd "npm run serve" --working-dir ./src --max-restarts 5
+  $ reloaderoo info
 
 Environment Variables:
-  MCPDEV_PROXY_LOG_LEVEL      Set default log level
-  MCPDEV_PROXY_LOG_FILE       Custom log file path
-  MCPDEV_PROXY_RESTART_LIMIT  Default restart limit
-  MCPDEV_PROXY_AUTO_RESTART   Enable/disable auto-restart (true/false)
-  MCPDEV_PROXY_TIMEOUT        Operation timeout in milliseconds
-  MCPDEV_PROXY_CHILD_CMD      Default child command
-  MCPDEV_PROXY_CWD            Default working directory`);
+  RELOADEROO_LOG_LEVEL      Set default log level
+  RELOADEROO_LOG_FILE       Custom log file path
+  RELOADEROO_RESTART_LIMIT  Default restart limit
+  RELOADEROO_AUTO_RESTART   Enable/disable auto-restart (true/false)
+  RELOADEROO_TIMEOUT        Operation timeout in milliseconds
+  RELOADEROO_CHILD_CMD      Default child command
+  RELOADEROO_CWD            Default working directory`);
 
 // Main proxy command with options
 program
@@ -201,7 +201,7 @@ program
       const childCmd = options.childCmd || envConfig.childCommand;
       if (!childCmd) {
         process.stderr.write('Error: --child-cmd is required\n');
-        process.stderr.write('Try: mcpdev-proxy --help\n');
+        process.stderr.write('Try: reloaderoo --help\n');
         process.exit(1);
       }
       
@@ -308,7 +308,7 @@ program
       
       // Start the proxy
       if (!options.quiet) {
-        process.stderr.write('Starting mcpdev-proxy...\n');
+        process.stderr.write('Starting reloaderoo...\n');
         process.stderr.write(`Child: ${childCommand} ${childArgs.join(' ')}\n`);
         process.stderr.write(`Working Directory: ${proxyConfig.workingDirectory}\n`);
       }
@@ -344,7 +344,7 @@ program
   .action((options) => {
     const version = getVersion();
     
-    process.stdout.write(`mcpdev-proxy v${version}\n`);
+    process.stdout.write(`reloaderoo v${version}\n`);
     process.stdout.write('\n');
     
     // Basic info
@@ -387,7 +387,7 @@ program
         });
     }
     
-    process.stdout.write('\nFor more information: https://github.com/your-org/mcpdev-proxy\n');
+    process.stdout.write('\nFor more information: https://github.com/your-org/reloaderoo\n');
   });
 
 /**

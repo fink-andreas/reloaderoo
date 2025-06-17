@@ -1,6 +1,6 @@
-# 🔄 mcpdev-proxy
+# 🦘 reloaderoo
 
-[![npm version](https://badge.fury.io/js/mcpdev-proxy.svg)](https://badge.fury.io/js/mcpdev-proxy)
+[![npm version](https://badge.fury.io/js/reloaderoo.svg)](https://badge.fury.io/js/reloaderoo)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
 
@@ -8,11 +8,11 @@
 
 A transparent development proxy for the Model Context Protocol (MCP) that enables seamless hot-reloading of MCP servers during development. Perfect for AI coding sessions with Claude Code, Cursor, Windsurf, and other MCP-enabled clients.
 
-## 🎯 Why mcpdev-proxy?
+## 🎯 Why reloaderoo?
 
 When developing MCP servers, you typically need to restart your entire AI coding session every time you make changes to your server code. This breaks your development flow and loses context.
 
-**mcpdev-proxy solves this by:**
+**reloaderoo solves this by:**
 - 🔄 **Hot-reloading** your MCP server without disconnecting the client
 - 🔧 **Preserving session state** between server restarts  
 - 🛠️ **Adding a `restart_server` tool** that your AI agent can call
@@ -25,10 +25,10 @@ When developing MCP servers, you typically need to restart your entire AI coding
 
 ```bash
 # Install globally for easy access
-npm install -g mcpdev-proxy
+npm install -g reloaderoo
 
 # Or install locally in your project
-npm install --save-dev mcpdev-proxy
+npm install --save-dev reloaderoo
 ```
 
 ### Basic Usage
@@ -40,11 +40,11 @@ Instead of connecting your AI client directly to your MCP server:
 # Client connects to: node my-mcp-server.js
 ```
 
-Connect through mcpdev-proxy:
+Connect through reloaderoo:
 
 ```bash
-# ✅ With mcpdev-proxy (hot-reload without client restart)
-mcpdev-proxy --child-cmd "node my-mcp-server.js"
+# ✅ With reloaderoo (hot-reload without client restart)
+reloaderoo --child-cmd "node my-mcp-server.js"
 ```
 
 Now your client connects to the proxy, and the proxy manages your server's lifecycle!
@@ -55,7 +55,7 @@ Now your client connects to the proxy, and the proxy manages your server's lifec
 
 Configure your AI client (Claude Code, Cursor, etc.) to connect to:
 ```bash
-mcpdev-proxy --child-cmd "node my-mcp-server.js" --log-level debug
+reloaderoo --child-cmd "node my-mcp-server.js" --log-level debug
 ```
 
 ### 2. **Develop Your MCP Server**
@@ -88,7 +88,7 @@ Your AI session continues with the updated server capabilities. No connection lo
 ## 📋 Command Line Options
 
 ```bash
-mcpdev-proxy [options]
+reloaderoo [options]
 
 Options:
   -c, --child-cmd <command>        Command to run your MCP server (required)
@@ -111,43 +111,43 @@ Commands:
 Perfect for development with Claude Code, Cursor, Windsurf, or any MCP-enabled AI assistant:
 ```bash
 # Start your coding session with hot-reload enabled
-mcpdev-proxy --child-cmd "npm run dev" --log-level debug
+reloaderoo --child-cmd "npm run dev" --log-level debug
 ```
 
 ### **Multi-Language Development**
 Works with MCP servers in any language:
 ```bash
 # Node.js server
-mcpdev-proxy --child-cmd "node server.js"
+reloaderoo --child-cmd "node server.js"
 
 # Python server  
-mcpdev-proxy --child-cmd "python server.py"
+reloaderoo --child-cmd "python server.py"
 
 # Compiled binary
-mcpdev-proxy --child-cmd "./my-server"
+reloaderoo --child-cmd "./my-server"
 
 # With arguments
-mcpdev-proxy --child-cmd "node server.js" --child-args "--port" "8080" "--debug"
+reloaderoo --child-cmd "node server.js" --child-args "--port" "8080" "--debug"
 ```
 
 ### **Complex Development Setups**
 Handle sophisticated build processes:
 ```bash
 # TypeScript with build step
-mcpdev-proxy --child-cmd "npm run build && npm run start"
+reloaderoo --child-cmd "npm run build && npm run start"
 
 # Development with watch mode
-mcpdev-proxy --child-cmd "npm run dev"
+reloaderoo --child-cmd "npm run dev"
 
 # Custom working directory
-mcpdev-proxy --child-cmd "python server.py" --working-dir "./src"
+reloaderoo --child-cmd "python server.py" --working-dir "./src"
 ```
 
 ## 🏗️ How It Works
 
 ```mermaid
 graph LR
-    A[AI Client] -->|MCP Protocol| B[mcpdev-proxy]
+    A[AI Client] -->|MCP Protocol| B[reloaderoo]
     B -->|Forwards Messages| C[Your MCP Server]
     B -->|Manages Lifecycle| C
     B -->|Adds restart_server Tool| A
@@ -179,7 +179,7 @@ export MCPDEV_PROXY_TIMEOUT=30000
 
 ### Configuration File Support
 ```javascript
-// mcpdev-proxy.config.js
+// reloaderoo.config.js
 export default {
   childCommand: "node",
   childArgs: ["server.js"],
@@ -197,7 +197,7 @@ Add to your project's `claude_desktop_config.json`:
 {
   "mcpServers": {
     "my-dev-server": {
-      "command": "mcpdev-proxy",
+      "command": "reloaderoo",
       "args": ["--child-cmd", "node my-server.js", "--log-level", "info"]
     }
   }
@@ -208,9 +208,9 @@ Add to your project's `claude_desktop_config.json`:
 ```json
 {
   "scripts": {
-    "dev": "mcpdev-proxy --child-cmd 'npm run server:dev'",
-    "mcp:proxy": "mcpdev-proxy --child-cmd 'node dist/server.js'",
-    "mcp:debug": "mcpdev-proxy --child-cmd 'node server.js' --log-level debug"
+    "dev": "reloaderoo --child-cmd 'npm run server:dev'",
+    "mcp:proxy": "reloaderoo --child-cmd 'node dist/server.js'",
+    "mcp:debug": "reloaderoo --child-cmd 'node server.js' --log-level debug"
   }
 }
 ```
@@ -225,34 +225,34 @@ Add to your project's `claude_desktop_config.json`:
 node my-server.js
 
 # Then try with dry-run to validate configuration
-mcpdev-proxy --child-cmd "node my-server.js" --dry-run
+reloaderoo --child-cmd "node my-server.js" --dry-run
 ```
 
 **Connection problems:**
 ```bash
 # Enable debug logging
-mcpdev-proxy --child-cmd "node my-server.js" --log-level debug
+reloaderoo --child-cmd "node my-server.js" --log-level debug
 
 # Check system info
-mcpdev-proxy info --verbose
+reloaderoo info --verbose
 ```
 
 **Restart failures:**
 ```bash
 # Increase restart timeout
-mcpdev-proxy --child-cmd "node my-server.js" --restart-timeout 60000
+reloaderoo --child-cmd "node my-server.js" --restart-timeout 60000
 
 # Check restart limits  
-mcpdev-proxy --child-cmd "node my-server.js" --max-restarts 5
+reloaderoo --child-cmd "node my-server.js" --max-restarts 5
 ```
 
 ### **Debug Mode**
 ```bash
 # Get detailed information about what's happening
-mcpdev-proxy --child-cmd "node my-server.js" --debug
+reloaderoo --child-cmd "node my-server.js" --debug
 
 # View system diagnostics
-mcpdev-proxy info --verbose
+reloaderoo info --verbose
 ```
 
 ## 📚 API Reference
@@ -285,8 +285,8 @@ We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guid
 
 ### **Development Setup**
 ```bash
-git clone https://github.com/your-org/mcpdev-proxy.git
-cd mcpdev-proxy
+git clone https://github.com/your-org/reloaderoo.git
+cd reloaderoo
 npm install
 npm run build
 npm test

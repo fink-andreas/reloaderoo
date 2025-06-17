@@ -1,5 +1,5 @@
 /**
- * MCP Development Proxy - Production Implementation
+ * Reloaderoo - Production Implementation
  * 
  * A transparent proxy that enables hot-reloading of MCP servers during development
  * while maintaining client session state. Supports the full MCP protocol including
@@ -37,7 +37,7 @@ import { logger } from './mcp-logger.js';
 import type { ProxyConfig } from './types.js';
 
 /**
- * Production-ready MCP Development Proxy with full protocol support
+ * Production-ready Reloaderoo with full protocol support
  */
 export class MCPProxy {
   private readonly config: ProxyConfig;
@@ -77,7 +77,7 @@ export class MCPProxy {
    * Start the proxy and connect to child server
    */
   async start(): Promise<void> {
-    logger.info('Starting MCP Development Proxy', {
+    logger.info('Starting Reloaderoo', {
       childCommand: this.config.childCommand,
       childArgs: this.config.childArgs
     });
@@ -89,7 +89,7 @@ export class MCPProxy {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
     
-    logger.info('MCP Development Proxy started successfully');
+    logger.info('Reloaderoo started successfully');
   }
 
   /**
@@ -99,7 +99,7 @@ export class MCPProxy {
     if (this.isShuttingDown) return;
     this.isShuttingDown = true;
 
-    logger.info('Stopping MCP Development Proxy');
+    logger.info('Stopping Reloaderoo');
 
     try {
       await this.stopChildServer();
@@ -140,7 +140,7 @@ export class MCPProxy {
 
     this.childClient = new Client(
       {
-        name: 'mcpdev-proxy',
+        name: 'reloaderoo',
         version: '1.0.0'
       },
       {

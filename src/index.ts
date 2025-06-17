@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * mcpdev-proxy - A transparent MCP development wrapper
+ * reloaderoo - A transparent MCP development wrapper
  * 
  * Main CLI entry point for the proxy functionality.
  */
@@ -12,6 +12,6 @@ export { logger, LoggerManager } from './logger.js';
 
 // CLI functionality - only run if this file is executed directly
 if (import.meta.url === `file://${process.argv[1]}`) {
-  const { runCLI } = await import('./bin/mcpdev-proxy.js');
+  const { runCLI } = await import('./bin/reloaderoo.js');
   await runCLI();
 }
