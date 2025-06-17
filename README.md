@@ -56,13 +56,13 @@ Now your client connects to the proxy, and the proxy manages your server's lifec
 | **VSCode** | ✅ **Excellent** | ✅ Full | ✅ Full | ✅ Full | ✅ **Auto-detect** | Detects tool addition/removal + updates |
 | **Claude Code** | ✅ **Good** | ✅ Full | ✅ Full | ❌ Not supported | ⚠️ **Manual refresh** | Tool updates work, no auto-detection |
 | **Cursor** | ❌ **Issues** | ❓ Unknown | ❓ Unknown | ❓ Unknown | ❓ Unknown | Server startup errors reported |
-| **Windsurf** | ❓ **Untested** | ❓ Unknown | ❓ Unknown | ❓ Unknown | ❓ Unknown | Compatibility unknown |
+| **Windsurf** | ❌ **Issues** | ❓ Unknown | ❓ Unknown | ❓ Unknown | ❓ Unknown | Same startup errors as Cursor |
 
 ### 🎯 **Recommended Clients**
 
 **Best Experience**: **VSCode** - Full protocol support with automatic capability detection  
 **Good Experience**: **Claude Code** - Works well, may need manual refresh for new tools  
-**Under Investigation**: **Cursor** - Known startup issues, investigating compatibility
+**Under Investigation**: **Cursor & Windsurf** - Both have startup issues, investigating compatibility
 
 ## 🛠️ Development Workflow
 
@@ -196,13 +196,15 @@ Add to your project's `claude_desktop_config.json`:
 
 ### **Client Compatibility Issues**
 
-**Cursor startup errors:**
+**Cursor & Windsurf startup errors:**
 ```bash
 # Check if reloaderoo works independently
 reloaderoo --child-cmd "node my-server.js" --dry-run
 
 # Try with explicit Node.js path
 reloaderoo --child-cmd "/usr/local/bin/node my-server.js"
+
+# Both clients show similar startup failures - may share common architecture
 ```
 
 **Claude Code not detecting new tools:**
@@ -311,9 +313,9 @@ Example usage in conversation:
 ⚠️ **Manual refresh**: May need to restart conversation for new tools  
 ❌ **Resources**: Not supported by Claude Code (client limitation)
 
-### **Cursor (Issues)**
-⚠️ **Known Issues**: Currently experiencing server startup errors  
-🔍 **Investigation**: Compatibility problems under investigation  
+### **Cursor & Windsurf (Issues)**
+⚠️ **Known Issues**: Both clients experiencing identical server startup errors  
+🔍 **Investigation**: Compatibility problems under investigation (may be shared architecture)  
 📋 **Workaround**: Use VSCode or Claude Code for now
 
 ## 🤝 Contributing
