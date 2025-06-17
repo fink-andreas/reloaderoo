@@ -55,14 +55,13 @@ Now your client connects to the proxy, and the proxy manages your server's lifec
 |------------|--------|-------|---------|-----------|------------|-------|
 | **VSCode** | ✅ **Excellent** | ✅ Full | ✅ Full | ✅ Full | ✅ **Auto-detect** | Detects tool addition/removal + updates |
 | **Claude Code** | ✅ **Good** | ✅ Full | ✅ Full | ❌ Not supported | ⚠️ **Manual refresh** | Tool updates work, no auto-detection |
-| **Cursor** | ❌ **Issues** | ❓ Unknown | ❓ Unknown | ❓ Unknown | ❓ Unknown | Server startup errors reported |
-| **Windsurf** | ❌ **Issues** | ❓ Unknown | ❓ Unknown | ❓ Unknown | ❓ Unknown | Same startup errors as Cursor |
+| **Cursor** | ✅ **Excellent** | ✅ Full | ❓ Untested | ❓ Untested | ✅ **Auto-detect** | Detects tool addition/removal + updates |
+| **Windsurf** | ✅ **Good** | ✅ Full | ❓ Untested | ❓ Untested | ⚠️ **Manual refresh** | Tool updates work, no auto-detection |
 
 ### 🎯 **Recommended Clients**
 
-**Best Experience**: **VSCode** - Full protocol support with automatic capability detection  
-**Good Experience**: **Claude Code** - Works well, may need manual refresh for new tools  
-**Under Investigation**: **Cursor & Windsurf** - Both have startup issues, investigating compatibility
+**Best Experience**: **VSCode** & **Cursor** - Full protocol support with automatic capability detection  
+**Good Experience**: **Claude Code** & **Windsurf** - Works well, may need manual refresh for new tools  
 
 ## 🛠️ Development Workflow
 
@@ -196,15 +195,42 @@ Add to your project's `claude_desktop_config.json`:
 
 ### **Client Compatibility Issues**
 
-**Cursor & Windsurf startup errors:**
-```bash
-# Check if reloaderoo works independently
-reloaderoo --child-cmd "node my-server.js" --dry-run
+**Cursor configuration:**
+```json
+{
+  "mcpServers": {
+    "MyServer": {
+      "command": "node", 
+      "args": [
+        "/path/to/reloaderoo.js",
+        "--child-cmd",
+        "node",
+        "--child-args",
+        "/path/to/my-server.js",
+        "--working-dir",
+        "/path/to/accessible/directory"
+      ]
+    }
+  }
+}
+```
 
-# Try with explicit Node.js path
-reloaderoo --child-cmd "/usr/local/bin/node my-server.js"
-
-# Both clients show similar startup failures - may share common architecture
+**Windsurf configuration:**
+```json
+{
+  "mcpServers": {
+    "MyServer": {
+      "command": "node",
+      "args": [
+        "/path/to/reloaderoo.js",
+        "--child-cmd",
+        "node /path/to/my-server.js",
+        "--working-dir",
+        "/path/to/accessible/directory"
+      ]
+    }
+  }
+}
 ```
 
 **Claude Code not detecting new tools:**
