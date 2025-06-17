@@ -2,7 +2,7 @@
   "name": "reloaderoo",
   "version": "1.0.0",
   "type": "module",
-  "description": "Hot-reload your MCP servers without restarting your AI coding assistant. A transparent development proxy for the Model Context Protocol that enables seamless server restarts during development.",
+  "description": "Hot-reload your MCP servers without restarting your AI coding assistant. Works excellently with VSCode MCP, well with Claude Code. A transparent development proxy for the Model Context Protocol that enables seamless server restarts during development.",
   "keywords": [
     "mcp",
     "model-context-protocol", 
@@ -11,21 +11,23 @@
     "hot-reload",
     "ai",
     "claude-code",
-    "cursor",
+    "vscode",
+    "cursor", 
     "windsurf",
     "development-tools",
-    "debugging"
+    "debugging",
+    "compatibility"
   ],
-  "homepage": "https://github.com/your-org/reloaderoo#readme",
+  "homepage": "https://github.com/cameroncooke/reloaderoo#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/your-org/reloaderoo.git"
+    "url": "git+https://github.com/cameroncooke/reloaderoo.git"
   },
   "bugs": {
-    "url": "https://github.com/your-org/reloaderoo/issues"
+    "url": "https://github.com/cameroncooke/reloaderoo/issues"
   },
   "license": "MIT",
-  "author": "Your Name <your.email@example.com>",
+  "author": "Cameron Cooke <web@cameroncooke.com>",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
@@ -47,7 +49,7 @@
     "lint": "tsc --noEmit",
     "prepublishOnly": "npm run prepare-release",
     "inspector": "pkill -f '@modelcontextprotocol/inspector' || true && DANGEROUSLY_OMIT_AUTH=true npx @modelcontextprotocol/inspector",
-    "test:inspector": "npm run build && npm run inspector"
+    "inspector:test": "npm run build && npm run inspector node 'dist/bin/reloaderoo.js --child-cmd \"node test-server-sdk.js\"'"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.3",
