@@ -1,19 +1,28 @@
 {
   "name": "mcpdev-proxy",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "type": "module",
-  "description": "A transparent MCP development wrapper that acts as a proxy between MCP clients and servers, enabling hot-reloading without losing client session state",
+  "description": "Hot-reload your MCP servers without restarting your AI coding assistant. A transparent development proxy for the Model Context Protocol that enables seamless server restarts during development.",
   "keywords": [
     "mcp",
-    "model-context-protocol",
+    "model-context-protocol", 
     "development",
     "proxy",
-    "hot-reload"
+    "hot-reload",
+    "ai",
+    "claude-code",
+    "cursor",
+    "windsurf",
+    "development-tools",
+    "debugging"
   ],
-  "homepage": "https://github.com/your-org/mcpdev-proxy",
+  "homepage": "https://github.com/your-org/mcpdev-proxy#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-org/mcpdev-proxy.git"
+    "url": "git+https://github.com/your-org/mcpdev-proxy.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-org/mcpdev-proxy/issues"
   },
   "license": "MIT",
   "author": "Your Name <your.email@example.com>",
