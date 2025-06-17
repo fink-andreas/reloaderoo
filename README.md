@@ -1,4 +1,4 @@
-# 🦘 reloaderoo
+![reloaderoo](banner.png)
 
 [![npm version](https://badge.fury.io/js/reloaderoo.svg)](https://badge.fury.io/js/reloaderoo)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -6,7 +6,7 @@
 
 > **Hot-reload your MCP servers without restarting your AI coding assistant**
 
-A transparent development proxy for the Model Context Protocol (MCP) that enables seamless hot-reloading of MCP servers during development. Perfect for AI coding sessions with Claude Code, Cursor, Windsurf, and other MCP-enabled clients.
+A transparent development proxy for the Model Context Protocol (MCP) that enables seamless hot-reloading of MCP servers during development. Works excellently with VSCode MCP, well with Claude Code, and supports other MCP-enabled clients.
 
 ## 🎯 Why reloaderoo?
 
@@ -49,11 +49,26 @@ reloaderoo --child-cmd "node my-mcp-server.js"
 
 Now your client connects to the proxy, and the proxy manages your server's lifecycle!
 
+## 🔌 Client Compatibility
+
+| MCP Client | Status | Tools | Prompts | Resources | Hot-Reload | Notes |
+|------------|--------|-------|---------|-----------|------------|-------|
+| **VSCode** | ✅ **Excellent** | ✅ Full | ✅ Full | ✅ Full | ✅ **Auto-detect** | Detects tool addition/removal + updates |
+| **Claude Code** | ✅ **Good** | ✅ Full | ✅ Full | ❌ Not supported | ⚠️ **Manual refresh** | Tool updates work, no auto-detection |
+| **Cursor** | ❌ **Issues** | ❓ Unknown | ❓ Unknown | ❓ Unknown | ❓ Unknown | Server startup errors reported |
+| **Windsurf** | ❓ **Untested** | ❓ Unknown | ❓ Unknown | ❓ Unknown | ❓ Unknown | Compatibility unknown |
+
+### 🎯 **Recommended Clients**
+
+**Best Experience**: **VSCode** - Full protocol support with automatic capability detection  
+**Good Experience**: **Claude Code** - Works well, may need manual refresh for new tools  
+**Under Investigation**: **Cursor** - Known startup issues, investigating compatibility
+
 ## 🛠️ Development Workflow
 
 ### 1. **Start Development Session**
 
-Configure your AI client (Claude Code, Cursor, etc.) to connect to:
+Configure your AI client (VSCode recommended, Claude Code also works well) to connect to:
 ```bash
 reloaderoo --child-cmd "node my-mcp-server.js" --log-level debug
 ```
@@ -103,44 +118,6 @@ Options:
   
 Commands:
   info                            Show system information and diagnostics
-```
-
-## 💡 Use Cases
-
-### **AI Coding Sessions**
-Perfect for development with Claude Code, Cursor, Windsurf, or any MCP-enabled AI assistant:
-```bash
-# Start your coding session with hot-reload enabled
-reloaderoo --child-cmd "npm run dev" --log-level debug
-```
-
-### **Multi-Language Development**
-Works with MCP servers in any language:
-```bash
-# Node.js server
-reloaderoo --child-cmd "node server.js"
-
-# Python server  
-reloaderoo --child-cmd "python server.py"
-
-# Compiled binary
-reloaderoo --child-cmd "./my-server"
-
-# With arguments
-reloaderoo --child-cmd "node server.js" --child-args "--port" "8080" "--debug"
-```
-
-### **Complex Development Setups**
-Handle sophisticated build processes:
-```bash
-# TypeScript with build step
-reloaderoo --child-cmd "npm run build && npm run start"
-
-# Development with watch mode
-reloaderoo --child-cmd "npm run dev"
-
-# Custom working directory
-reloaderoo --child-cmd "python server.py" --working-dir "./src"
 ```
 
 ## 🏗️ How It Works
@@ -217,6 +194,27 @@ Add to your project's `claude_desktop_config.json`:
 
 ## 🚨 Troubleshooting
 
+### **Client Compatibility Issues**
+
+**Cursor startup errors:**
+```bash
+# Check if reloaderoo works independently
+reloaderoo --child-cmd "node my-server.js" --dry-run
+
+# Try with explicit Node.js path
+reloaderoo --child-cmd "/usr/local/bin/node my-server.js"
+```
+
+**Claude Code not detecting new tools:**
+- Tools will work after restart, but auto-detection may not occur
+- Manually restart conversation or refresh client to see new tools
+- Existing tool updates are detected automatically
+
+**VSCode best experience:**
+- Automatic tool detection and updates
+- Full protocol support (tools, prompts, resources)
+- Real-time capability changes
+
 ### **Common Issues**
 
 **Server won't start:**
@@ -279,6 +277,45 @@ Example usage in conversation:
 "Restart the server with debug logging enabled"
 ```
 
+## 🔧 Client-Specific Setup
+
+### **VSCode (Recommended)**
+```json
+// settings.json or workspace config
+{
+  "mcpServers": {
+    "my-dev-server": {
+      "command": "reloaderoo",
+      "args": ["--child-cmd", "node my-server.js"]
+    }
+  }
+}
+```
+✅ **Auto-detection**: New tools appear automatically after restart  
+✅ **Full protocol**: Tools, prompts, resources all supported  
+✅ **Real-time updates**: Changes to existing tools detected immediately
+
+### **Claude Code**
+```json
+// claude_desktop_config.json  
+{
+  "mcpServers": {
+    "my-dev-server": {
+      "command": "reloaderoo",
+      "args": ["--child-cmd", "node my-server.js"]
+    }
+  }
+}
+```
+✅ **Tools & Prompts**: Full support for tools and prompts  
+⚠️ **Manual refresh**: May need to restart conversation for new tools  
+❌ **Resources**: Not supported by Claude Code (client limitation)
+
+### **Cursor (Issues)**
+⚠️ **Known Issues**: Currently experiencing server startup errors  
+🔍 **Investigation**: Compatibility problems under investigation  
+📋 **Workaround**: Use VSCode or Claude Code for now
+
 ## 🤝 Contributing
 
 We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
@@ -305,16 +342,6 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## 🔗 Related Projects
 
-- **[XcodeBuildMCP](https://npmjs.com/package/xcodebuildmcp)** - MCP server for Xcode development workflow automation
+- **[XcodeBuildMCP](https://github.com/cameroncooke/XcodeBuildMCP)** - MCP server for Xcode development workflow automation
 - **[Model Context Protocol](https://modelcontextprotocol.io)** - Official MCP specification and tools
-- **[Claude Code](https://claude.ai/code)** - AI coding assistant with MCP support
-
----
-
-<div align="center">
-
-**Happy MCP Development! 🚀**
-
-*Built with ❤️ for the MCP development community*
-
-</div>
+- **[Claude Code](https://www.anthropic.com/claude-code)** - AI coding assistant with MCP support
