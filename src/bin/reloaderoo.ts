@@ -54,44 +54,6 @@ function validateDirectory(path: string, name: string): { valid: boolean; error?
   }
 }
 
-/**
- * Parse child command and arguments from a single string
- * Handles quoted arguments properly
- */
-function parseChildCommand(cmdString: string): { command: string; args: string[] } {
-  const args: string[] = [];
-  let current = '';
-  let inQuote = false;
-  let quoteChar = '';
-  
-  for (let i = 0; i < cmdString.length; i++) {
-    const char = cmdString[i];
-    
-    if (!inQuote && (char === '"' || char === "'")) {
-      inQuote = true;
-      quoteChar = char;
-    } else if (inQuote && char === quoteChar) {
-      inQuote = false;
-      quoteChar = '';
-    } else if (!inQuote && char === ' ') {
-      if (current) {
-        args.push(current);
-        current = '';
-      }
-    } else {
-      current += char;
-    }
-  }
-  
-  if (current) {
-    args.push(current);
-  }
-  
-  return {
-    command: args[0] || '',
-    args: args.slice(1)
-  };
-}
 
 /**
  * Format duration for human-readable output
@@ -109,12 +71,12 @@ program
   .name('reloaderoo')
   .description('A transparent MCP development wrapper for hot-reloading servers')
   .version(getVersion())
-  .usage('[options] | info')
+  .usage('[options] -- <child-command> [child-args...]')
   .addHelpText('after', `
 Examples:
-  $ reloaderoo --child-cmd "node server.js"
-  $ reloaderoo --child-cmd "python mcp_server.py" --log-level debug
-  $ reloaderoo --child-cmd "npm run serve" --working-dir ./src --max-restarts 5
+  $ reloaderoo -- node server.js
+  $ reloaderoo --log-level debug -- python mcp_server.py --port 8080
+  $ reloaderoo --working-dir ./src --max-restarts 5 -- npm run serve
   $ reloaderoo info
 
 Environment Variables:
@@ -123,19 +85,10 @@ Environment Variables:
   RELOADEROO_RESTART_LIMIT  Default restart limit
   RELOADEROO_AUTO_RESTART   Enable/disable auto-restart (true/false)
   RELOADEROO_TIMEOUT        Operation timeout in milliseconds
-  RELOADEROO_CHILD_CMD      Default child command
   RELOADEROO_CWD            Default working directory`);
 
 // Main proxy command with options
 program
-  .option(
-    '-c, --child-cmd <command>',
-    'Command to run the child MCP server (required)'
-  )
-  .option(
-    '-a, --child-args <args...>',
-    'Arguments to pass to the child server'
-  )
   .option(
     '-w, --working-dir <directory>',
     'Working directory for the child process',
@@ -197,23 +150,18 @@ program
         process.stderr.write('Loaded configuration from environment variables\n');
       }
       
-      // Check if child-cmd is provided (either via CLI or environment)
-      const childCmd = options.childCmd || envConfig.childCommand;
-      if (!childCmd) {
-        process.stderr.write('Error: --child-cmd is required\n');
+      // Parse child command using pass-through syntax (-- child-command [args...])
+      const dashIndex = process.argv.indexOf('--');
+      if (dashIndex === -1 || dashIndex >= process.argv.length - 1) {
+        process.stderr.write('Error: Child command is required\n');
+        process.stderr.write('Use: reloaderoo [options] -- <command> [args...]\n');
+        process.stderr.write('Example: reloaderoo -- node server.js\n');
         process.stderr.write('Try: reloaderoo --help\n');
         process.exit(1);
       }
       
-      // Parse child command if needed
-      let childCommand = childCmd;
-      let childArgs = options.childArgs || [];
-      
-      if (!options.childArgs && childCmd.includes(' ')) {
-        const parsed = parseChildCommand(childCmd);
-        childCommand = parsed.command;
-        childArgs = parsed.args;
-      }
+      const childCommand = process.argv[dashIndex + 1]!;
+      const childArgs = process.argv.slice(dashIndex + 2);
       
       // Validate child command
       const cmdValidation = validateCommand(childCommand);
