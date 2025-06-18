@@ -44,7 +44,7 @@ Connect through reloaderoo:
 
 ```bash
 # ✅ With reloaderoo (hot-reload without client restart)
-reloaderoo --child-cmd "node my-mcp-server.js"
+reloaderoo -- node my-mcp-server.js
 ```
 
 Now your client connects to the proxy, and the proxy manages your server's lifecycle!
@@ -69,7 +69,7 @@ Now your client connects to the proxy, and the proxy manages your server's lifec
 
 Configure your AI client (VSCode recommended, Claude Code also works well) to connect to:
 ```bash
-reloaderoo --child-cmd "node my-mcp-server.js" --log-level debug
+reloaderoo -- node my-mcp-server.js --log-level debug
 ```
 
 ### 2. **Develop Your MCP Server**
@@ -102,11 +102,9 @@ Your AI session continues with the updated server capabilities. No connection lo
 ## 📋 Command Line Options
 
 ```bash
-reloaderoo [options]
+reloaderoo [options] -- <command> [args...]
 
 Options:
-  -c, --child-cmd <command>        Command to run your MCP server (required)
-  -a, --child-args <args...>       Arguments to pass to your server
   -w, --working-dir <directory>    Working directory for the server process
   -l, --log-level <level>          Log level (debug, info, warning, error)
   -m, --max-restarts <number>      Maximum restart attempts (default: 3)
@@ -174,7 +172,7 @@ Add to your project's `claude_desktop_config.json`:
   "mcpServers": {
     "my-dev-server": {
       "command": "reloaderoo",
-      "args": ["--child-cmd", "node my-server.js", "--log-level", "info"]
+      "args": ["--log-level", "info", "--", "node", "my-server.js"]
     }
   }
 }
@@ -184,9 +182,9 @@ Add to your project's `claude_desktop_config.json`:
 ```json
 {
   "scripts": {
-    "dev": "reloaderoo --child-cmd 'npm run server:dev'",
-    "mcp:proxy": "reloaderoo --child-cmd 'node dist/server.js'",
-    "mcp:debug": "reloaderoo --child-cmd 'node server.js' --log-level debug"
+    "dev": "reloaderoo -- npm run server:dev",
+    "mcp:proxy": "reloaderoo -- node dist/server.js",
+    "mcp:debug": "reloaderoo --log-level debug -- node server.js"
   }
 }
 ```
@@ -195,27 +193,7 @@ Add to your project's `claude_desktop_config.json`:
 
 ### **Client Compatibility Issues**
 
-**Cursor configuration:**
-```json
-{
-  "mcpServers": {
-    "MyServer": {
-      "command": "node", 
-      "args": [
-        "/path/to/reloaderoo.js",
-        "--child-cmd",
-        "node",
-        "--child-args",
-        "/path/to/my-server.js",
-        "--working-dir",
-        "/path/to/accessible/directory"
-      ]
-    }
-  }
-}
-```
-
-**Windsurf configuration:**
+**Universal configuration (all clients):**
 ```json
 {
   "mcpServers": {
@@ -223,10 +201,11 @@ Add to your project's `claude_desktop_config.json`:
       "command": "node",
       "args": [
         "/path/to/reloaderoo.js",
-        "--child-cmd",
-        "node /path/to/my-server.js",
         "--working-dir",
-        "/path/to/accessible/directory"
+        "/path/to/accessible/directory",
+        "--",
+        "node",
+        "/path/to/my-server.js"
       ]
     }
   }
@@ -251,13 +230,13 @@ Add to your project's `claude_desktop_config.json`:
 node my-server.js
 
 # Then try with dry-run to validate configuration
-reloaderoo --child-cmd "node my-server.js" --dry-run
+reloaderoo -- node my-server.js --dry-run
 ```
 
 **Connection problems:**
 ```bash
 # Enable debug logging
-reloaderoo --child-cmd "node my-server.js" --log-level debug
+reloaderoo --log-level debug -- node my-server.js
 
 # Check system info
 reloaderoo info --verbose
@@ -266,16 +245,16 @@ reloaderoo info --verbose
 **Restart failures:**
 ```bash
 # Increase restart timeout
-reloaderoo --child-cmd "node my-server.js" --restart-timeout 60000
+reloaderoo -- node my-server.js --restart-timeout 60000
 
 # Check restart limits  
-reloaderoo --child-cmd "node my-server.js" --max-restarts 5
+reloaderoo -- node my-server.js --max-restarts 5
 ```
 
 ### **Debug Mode**
 ```bash
 # Get detailed information about what's happening
-reloaderoo --child-cmd "node my-server.js" --debug
+reloaderoo -- node my-server.js --debug
 
 # View system diagnostics
 reloaderoo info --verbose
@@ -314,7 +293,7 @@ Example usage in conversation:
   "mcpServers": {
     "my-dev-server": {
       "command": "reloaderoo",
-      "args": ["--child-cmd", "node my-server.js"]
+      "args": ["--", "node", "my-server.js"]
     }
   }
 }
@@ -330,7 +309,7 @@ Example usage in conversation:
   "mcpServers": {
     "my-dev-server": {
       "command": "reloaderoo",
-      "args": ["--child-cmd", "node my-server.js"]
+      "args": ["--", "node", "my-server.js"]
     }
   }
 }
