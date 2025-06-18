@@ -26,11 +26,32 @@ import type { ProxyConfig, LoggingLevel } from '../types.js';
  */
 function getVersion(): string {
   try {
-    // Use __dirname if available (CommonJS), otherwise construct path
-    const baseDir = typeof __dirname !== 'undefined' ? __dirname : dirname(__filename);
-    const packagePath = resolve(baseDir, '../../package.json');
-    const packageData = JSON.parse(readFileSync(packagePath, 'utf8'));
-    return packageData.version || '0.0.0';
+    // In ES modules, we need to use import.meta.url to get the current file path
+    // For built files: dist/bin/reloaderoo.js -> need to go up 2 levels to reach package.json
+    const currentDir = typeof __dirname !== 'undefined' 
+      ? __dirname 
+      : dirname(new URL(import.meta.url).pathname);
+    
+    // Try multiple potential package.json locations to be safe
+    const possiblePaths = [
+      resolve(currentDir, '../../package.json'),  // From dist/bin/ to root
+      resolve(currentDir, '../package.json'),     // From dist/ to root  
+      resolve(currentDir, './package.json'),      // Same directory
+    ];
+    
+    for (const packagePath of possiblePaths) {
+      try {
+        const packageData = JSON.parse(readFileSync(packagePath, 'utf8'));
+        if (packageData.version) {
+          return packageData.version;
+        }
+      } catch {
+        // Try next path
+        continue;
+      }
+    }
+    
+    return '0.0.0';
   } catch {
     return '0.0.0';
   }
