@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Build
+      run: npm run build
+    
+    - name: Test CLI help
+      run: node dist/bin/reloaderoo.js --help
+    
+    - name: Test CLI version
+      run: node dist/bin/reloaderoo.js --version
+    
+    - name: Test CLI info command
+      run: node dist/bin/reloaderoo.js info
+    
+    - name: Test invalid usage
+      run: |
+        if node dist/bin/reloaderoo.js 2>/dev/null; then
+          echo "Expected CLI to fail without arguments"
+          exit 1
+        else
+          echo "CLI correctly rejected invalid usage"
+        fi
+    
+    - name: Test dry run mode
+      run: node dist/bin/reloaderoo.js --dry-run -- echo "test command"

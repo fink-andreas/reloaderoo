@@ -1,0 +1,138 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Test version (e.g., 1.0.1-test)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build TypeScript
+        run: npm run build
+
+      - name: Test CLI functionality
+        run: |
+          node dist/bin/reloaderoo.js --help
+          node dist/bin/reloaderoo.js --version
+          node dist/bin/reloaderoo.js info
+          node dist/bin/reloaderoo.js --dry-run -- echo "test command"
+
+      - name: Get version from tag or input
+        id: get_version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+            echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+            echo "IS_TEST=true" >> $GITHUB_OUTPUT
+            echo "📝 Test version: $VERSION"
+            # Update package.json version for test releases only
+            npm version $VERSION --no-git-tag-version
+          else
+            VERSION=${GITHUB_REF#refs/tags/v}
+            echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+            echo "IS_TEST=false" >> $GITHUB_OUTPUT
+            echo "🚀 Release version: $VERSION"
+            # For tag-based releases, package.json was already updated by release script
+          fi
+
+      - name: Create package
+        run: npm pack
+
+      - name: Test publish (dry run for manual triggers)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          echo "🧪 Testing package creation (dry run)"
+          npm publish --dry-run --access public
+
+      - name: Publish to NPM (production releases only)
+        if: github.event_name == 'push'
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create GitHub Release (production releases only)
+        if: github.event_name == 'push'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.get_version.outputs.VERSION }}
+          name: Release v${{ steps.get_version.outputs.VERSION }}
+          body: |
+            ## Release v${{ steps.get_version.outputs.VERSION }}
+            
+            ### Features
+            - Transparent MCP development proxy with hot-reloading
+            - Universal pass-through syntax: `reloaderoo -- <command> [args...]`
+            - Works with all MCP clients (Claude Code, VSCode, Cursor, Windsurf)
+            - Zero-configuration setup with intelligent defaults
+            
+            ### Installation
+            ```bash
+            npm install -g reloaderoo@${{ steps.get_version.outputs.VERSION }}
+            ```
+            
+            Or use with npx:
+            ```bash
+            npx reloaderoo@${{ steps.get_version.outputs.VERSION }} -- node your-server.js
+            ```
+            
+            📦 **NPM Package**: https://www.npmjs.com/package/reloaderoo/v/${{ steps.get_version.outputs.VERSION }}
+            
+            ### Usage Examples
+            ```bash
+            # Basic usage
+            reloaderoo -- node server.js
+            
+            # With debugging
+            reloaderoo --log-level debug -- python mcp_server.py
+            
+            # Custom working directory
+            reloaderoo --working-dir ./src -- npm run serve
+            ```
+            
+            ### What's New
+            - Universal `--` pass-through syntax for all MCP clients
+            - Simplified argument parsing eliminates client compatibility issues
+            - Enhanced error handling and validation
+            - Comprehensive CLI testing and validation
+          files: |
+            reloaderoo-${{ steps.get_version.outputs.VERSION }}.tgz
+          draft: false
+          prerelease: false
+
+      - name: Summary
+        run: |
+          if [ "${{ steps.get_version.outputs.IS_TEST }}" = "true" ]; then
+            echo "🧪 Test completed for version: ${{ steps.get_version.outputs.VERSION }}"
+            echo "Ready for production release!"
+          else
+            echo "🎉 Production release completed!"
+            echo "Version: ${{ steps.get_version.outputs.VERSION }}"
+            echo "📦 NPM: https://www.npmjs.com/package/reloaderoo/v/${{ steps.get_version.outputs.VERSION }}"
+          fi
