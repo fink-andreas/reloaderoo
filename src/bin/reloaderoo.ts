@@ -5,12 +5,12 @@
  * without losing client session state. Acts as a proxy between MCP clients and servers.
  * 
  * Usage:
- *   reloaderoo --child-cmd "node server.js" [options]
+ *   reloaderoo [options] -- <command> [args...]
  *   reloaderoo info
  * 
  * Example:
- *   reloaderoo --child-cmd "node /path/to/my-mcp-server.js" --log-level debug
- *   reloaderoo --child-cmd "python server.py" --child-args "--port" "8080" --working-dir ./src
+ *   reloaderoo -- node /path/to/my-mcp-server.js
+ *   reloaderoo --log-level debug -- python server.py --port 8080
  */
 
 import { Command } from 'commander';
