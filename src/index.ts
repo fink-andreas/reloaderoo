@@ -11,7 +11,14 @@ export * from './types.js';
 export { logger, LoggerManager } from './logger.js';
 
 // CLI functionality - only run if this file is executed directly
-if (import.meta.url === `file://${process.argv[1]}`) {
+// Handle both direct execution and symlink execution (like npx)
+import { fileURLToPath } from 'url';
+import { realpath } from 'fs/promises';
+
+const currentFile = fileURLToPath(import.meta.url);
+const executablePath = process.argv[1] ? await realpath(process.argv[1]) : null;
+
+if (executablePath && currentFile === executablePath) {
   const { runCLI } = await import('./bin/reloaderoo.js');
   await runCLI();
 }
