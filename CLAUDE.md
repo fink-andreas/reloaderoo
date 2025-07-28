@@ -239,6 +239,27 @@ MCPDEV_PROXY_CWD=/path/to/directory     # Default working directory
 5. **Commit:** Create descriptive git commit
 6. **Update Plan:** Mark task as completed in IMPLEMENTATION_PLAN.md
 
+### Release Process
+
+**For bug fixes and new features, follow the standardized release process:**
+
+📖 **See @docs/RELEASE_PROCESS.md for complete workflow details**
+
+**Key requirements:**
+- ✅ **Always create feature branches** - Never work directly on `main`
+- ✅ **Request push permission** - Always ask before pushing to remote
+- ✅ **Logical commits** - Include root cause, solution, testing, and impact
+- ✅ **Comprehensive PR descriptions** - Use provided template with full context
+- ✅ **Add automated review** - Comment `cursor review` for additional bug detection
+
+**Quick workflow summary:**
+1. `git checkout -b fix/your-feature-name` (create branch)
+2. Make changes and commit with detailed message
+3. Ask permission: "May I push the commit to create a PR?"
+4. `git push origin fix/your-feature-name` (after permission granted)
+5. `gh pr create` with comprehensive description
+6. `gh pr comment [PR#] --body "cursor review"` (trigger automated review)
+
 ### Key Usage Distinctions
 
 #### When to Use Proxy Mode:
