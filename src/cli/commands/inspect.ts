@@ -10,43 +10,36 @@ import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 
 /**
- * Parse command and args from argv array after '--'
- */
-function parseChildCommand(argv: string[]): { command: string; args: string[] } | null {
-  const dashIndex = argv.indexOf('--');
-  if (dashIndex === -1 || dashIndex >= argv.length - 1) {
-    return null;
-  }
-  
-  return {
-    command: argv[dashIndex + 1]!,
-    args: argv.slice(dashIndex + 2)
-  };
-}
-
-/**
  * Create a standard inspection action handler
  */
 function createInspectionAction<T>(
   operation: (client: Client, ...args: any[]) => Promise<T>
 ) {
-  return async (...args: any[]) => {
-    // Extract options (always the last argument from commander)
-    const options = args[args.length - 1];
-    const commandArgs = args.slice(0, -1); // Remove options from args
-    
-    // Parse child command from process.argv
-    const childInfo = parseChildCommand(process.argv);
-    if (!childInfo) {
-      console.error(JSON.stringify({ error: 'Child command required after --' }, null, 2));
+  return async (...actionArgs: any[]) => {
+    // Commander passes args in order: [named_args..., variadic_array, options, command]
+    // We can reliably pop them off the end of the arguments array.
+    actionArgs.pop(); // Discard the commandObject, it's not needed.
+    const options = actionArgs.pop();
+    const childCommandArr = actionArgs.pop() as string[] | undefined;
+    // Whatever remains are the named arguments for the specific operation (e.g., <name>, <uri>)
+    const operationArgs = actionArgs;
+
+    // --- Validation of the child command ---
+    if (!Array.isArray(childCommandArr) || childCommandArr.length === 0) {
+      console.error(JSON.stringify({ error: 'Child command is required. Example: node server.js' }, null, 2));
       process.exit(1);
     }
+
+    const childInfo = {
+      command: childCommandArr[0]!,
+      args: childCommandArr.slice(1)
+    };
 
     let client: Client | undefined;
 
     // Set a timeout for the entire operation
     const timeout = parseInt(options.timeout || '30000', 10);
-    const timeoutPromise = new Promise((_, reject) => 
+    const timeoutPromise = new Promise((_, reject) =>
       setTimeout(() => reject(new Error(`Operation timed out after ${timeout}ms`)), timeout)
     );
 
@@ -59,7 +52,7 @@ function createInspectionAction<T>(
           cwd: options.workingDir || process.cwd(),
           env: process.env as Record<string, string>
         });
-        
+
         client = new Client({
           name: 'reloaderoo-inspector',
           version: '1.0.0'
@@ -70,9 +63,9 @@ function createInspectionAction<T>(
         // Connect the client
         await client.connect(transport);
 
-        // Execute the operation
-        const result = await operation(client, ...commandArgs);
-        
+        // Execute the operation, passing the client, its specific arguments, and the options object
+        const result = await operation(client, ...operationArgs, options);
+
         // Output the raw result
         console.log(JSON.stringify(result, null, 2));
       })();
@@ -113,21 +106,20 @@ Examples:
   $ reloaderoo inspect server-info -- node server.js
     `);
 
-  // Common options for all inspect subcommands
+  // Common options and argument for all inspect subcommands
   const addCommonOptions = (cmd: Command) => {
     return cmd
       .option('-w, --working-dir <dir>', 'Working directory for the child process')
-      .option('-t, --timeout <ms>', 'Operation timeout in milliseconds', '30000');
+      .option('-t, --timeout <ms>', 'Operation timeout in milliseconds', '30000')
+      .argument('[child-command...]', 'The child command and its arguments to execute');
   };
 
   // Server info command
   addCommonOptions(
     inspect.command('server-info')
       .description('Get server information and capabilities')
-      .action(createInspectionAction(async (client) => {
-        // Get server capabilities
+      .action(createInspectionAction(async (client: Client) => {
         const capabilities = client.getServerCapabilities();
-        // Return basic server info
         return {
           protocolVersion: '2024-11-05',
           capabilities
@@ -139,9 +131,8 @@ Examples:
   addCommonOptions(
     inspect.command('list-tools')
       .description('List all available tools')
-      .action(createInspectionAction(async (client) => {
-        const result = await client.listTools();
-        return result;
+      .action(createInspectionAction(async (client: Client) => {
+        return client.listTools();
       }))
   );
 
@@ -150,20 +141,19 @@ Examples:
     inspect.command('call-tool <name>')
       .description('Call a specific tool')
       .option('-p, --params <json>', 'Tool parameters as JSON string')
-      .action(createInspectionAction(async (client, name: string, options) => {
+      .action(createInspectionAction(async (client: Client, name: string, options: any) => {
         let params: unknown = undefined;
         if (options.params) {
           try {
             params = JSON.parse(options.params);
           } catch (error) {
-            throw new Error(`Invalid JSON parameters: ${error}`);
+            throw new Error(`Invalid JSON parameters: ${error instanceof Error ? error.message : String(error)}`);
           }
         }
-        const result = await client.callTool({
+        return client.callTool({
           name,
           arguments: params as Record<string, unknown> | undefined
         });
-        return result;
       }))
   );
 
@@ -171,9 +161,8 @@ Examples:
   addCommonOptions(
     inspect.command('list-resources')
       .description('List all available resources')
-      .action(createInspectionAction(async (client) => {
-        const result = await client.listResources();
-        return result;
+      .action(createInspectionAction(async (client: Client) => {
+        return client.listResources();
       }))
   );
 
@@ -181,11 +170,10 @@ Examples:
   addCommonOptions(
     inspect.command('read-resource <uri>')
       .description('Read a specific resource')
-      .action(createInspectionAction(async (client, uri: string) => {
-        const result = await client.readResource({
+      .action(createInspectionAction(async (client: Client, uri: string) => {
+        return client.readResource({
           uri
         });
-        return result;
       }))
   );
 
@@ -193,9 +181,8 @@ Examples:
   addCommonOptions(
     inspect.command('list-prompts')
       .description('List all available prompts')
-      .action(createInspectionAction(async (client) => {
-        const result = await client.listPrompts();
-        return result;
+      .action(createInspectionAction(async (client: Client) => {
+        return client.listPrompts();
       }))
   );
 
@@ -204,20 +191,19 @@ Examples:
     inspect.command('get-prompt <name>')
       .description('Get a specific prompt')
       .option('-a, --args <json>', 'Prompt arguments as JSON string')
-      .action(createInspectionAction(async (client, name: string, options) => {
+      .action(createInspectionAction(async (client: Client, name: string, options: any) => {
         let args: Record<string, string> | undefined = undefined;
         if (options.args) {
           try {
             args = JSON.parse(options.args);
           } catch (error) {
-            throw new Error(`Invalid JSON arguments: ${error}`);
+            throw new Error(`Invalid JSON arguments: ${error instanceof Error ? error.message : String(error)}`);
           }
         }
-        const result = await client.getPrompt({
+        return client.getPrompt({
           name,
           arguments: args as Record<string, string> | undefined
         });
-        return result;
       }))
   );
 
@@ -225,9 +211,8 @@ Examples:
   addCommonOptions(
     inspect.command('ping')
       .description('Check server connectivity')
-      .action(createInspectionAction(async (client) => {
-        const result = await client.ping();
-        return result;
+      .action(createInspectionAction(async (client: Client) => {
+        return client.ping();
       }))
   );
 
